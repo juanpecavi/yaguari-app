@@ -1,0 +1,39 @@
+name: Actualizar datos Yaguarí
+
+on:
+  schedule:
+    - cron: '0 10 * * 2'  # Cada martes a las 10am UTC (7am Uruguay)
+  workflow_dispatch:        # También se puede correr manualmente desde GitHub
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch new data
+        run: python scripts/update_data.py
+
+      - name: Check if data changed
+        id: check
+        run: |
+          git diff --quiet index.html && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Actualizar datos $(date +'%Y-%m-%d')"
+          git push
