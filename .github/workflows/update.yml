@@ -2,7 +2,7 @@ name: Actualizar datos Yaguarí
 
 on:
   schedule:
-    - cron: '0 10 * * 2'  # Cada martes a las 10am UTC (7am Uruguay)
+    - cron: '0 12 * * 3'  # Cada Miercoles a las 12am UTC (9am Uruguay)
   workflow_dispatch:        # También se puede correr manualmente desde GitHub
 
 jobs:
